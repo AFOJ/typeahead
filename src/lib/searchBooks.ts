@@ -1,13 +1,17 @@
-import type { AutocompleteOption } from "@/components/autocomplete/Autocomplete"
+import type {
+  AutocompleteOption,
+  SearchOptions,
+} from "@/components/autocomplete/Autocomplete"
 import type { Book } from "@/app/api/books/route"
 
 export async function searchBooks(
   query: string,
+  options?: SearchOptions,
 ): Promise<AutocompleteOption[]> {
   const url = new URL("/api/books", window.location.origin)
   url.searchParams.set("q", query)
 
-  const response = await fetch(url)
+  const response = await fetch(url, { signal: options?.signal })
 
   if (!response.ok) {
     throw new Error(`Books request failed with status ${response.status}`)
