@@ -6,8 +6,32 @@ import Autocomplete, {
 } from "@/components/autocomplete/Autocomplete"
 import { searchBooks } from "@/lib/searchBooks"
 
+type BookOption = AutocompleteOption & {
+  author?: string
+  year?: number | null
+}
+
+function AuthorYear({
+  author,
+  year,
+}: {
+  author?: string
+  year?: number | null
+}) {
+  if (!author && (year === null || year === undefined)) {
+    return null
+  }
+  return (
+    <p className="text-gray-500">
+      {author && year !== null && year !== undefined && `${author} | ${year}`}
+      {author && (year === null || year === undefined) && author}
+      {!author && year !== null && year !== undefined && year}
+    </p>
+  )
+}
+
 export default function Home() {
-  const [selected, setSelected] = useState<AutocompleteOption | null>(null)
+  const [selected, setSelected] = useState<BookOption | null>(null)
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
@@ -20,7 +44,23 @@ export default function Home() {
           value={selected}
           onChange={setSelected}
           search={searchBooks}
+          getOptionLabel={(o) =>
+            o.author ? `${o.label} (${o.author})` : o.label
+          }
         />
+        {selected && (
+          <div className="w-full">
+            <p className="text-sm text-gray-600 mb-2">
+              Showing results for: <strong>{selected.label}</strong>
+            </p>
+            <ul className="list-disc list-outside pl-5 space-y-2 text-sm">
+              <li key={selected.id}>
+                <span className="font-medium">{selected.label}</span>
+                <AuthorYear author={selected.author} year={selected.year} />
+              </li>
+            </ul>
+          </div>
+        )}
       </main>
     </div>
   )
